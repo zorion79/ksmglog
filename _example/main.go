@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	log "github.com/go-pkgz/lgr"
 	"github.com/zorion79/ksmglog"
@@ -10,8 +11,13 @@ import (
 func main() {
 	log.Setup(log.Debug, log.Msec, log.LevelBraces, log.CallerFile, log.CallerFunc) // setup default logger with go-pkgz/lgr
 
+	ksmgUrl := []string{os.Getenv("EXMPL_KSMG_URL")}
+	if strings.Contains(ksmgUrl[0], ",") {
+		ksmgUrl = strings.Split(ksmgUrl[0], ",")
+	}
+
 	options := ksmglog.Opts{
-		URL:      os.Getenv("EXMPL_KSMG_URL"),
+		URL:      ksmgUrl,
 		User:     os.Getenv("EXMPL_KSMG_USER"),
 		Password: os.Getenv("EXMPL_KSMG_PASS"),
 	}

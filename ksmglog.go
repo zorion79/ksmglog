@@ -20,7 +20,7 @@ type Service struct {
 
 // Opts collects parameters to initialize Service
 type Opts struct {
-	URL      string // url for ksmg web server https://ksmg01/ksmg/en-US/cgi-bin/klwi,https://ksmg02/ksmg/en-US/cgi-bin/klwi
+	URL      []string // url for ksmg web server https://ksmg01/ksmg/en-US/cgi-bin/klwi
 	User     string
 	Password string
 }
@@ -37,7 +37,7 @@ func NewService(opts Opts) *Service {
 // GetLogs return last audit logs
 func (s *Service) GetLogs() (records []Record, err error) {
 	records = make([]Record, 0)
-	for _, ksmgURL := range strings.Split(s.URL, ",") {
+	for _, ksmgURL := range s.URL {
 		_, c2htoken, cookies, err := s.userLogin(ksmgURL)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not login")

@@ -5,7 +5,7 @@ This library get last 500 records from Kaspersky Secure Mail Gateway (KSMG).
 - Collect records from many servers in one request
 - Every POST request provide timeout before run, because KSMG can return empty response.
 
-## Instal
+## Install
 
 `go get -u github.com/zorion79/ksmglog`
 
