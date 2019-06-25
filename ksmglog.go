@@ -20,9 +20,9 @@ type Service struct {
 
 // Opts collects parameters to initialize Service
 type Opts struct {
-	URL      []string // url for ksmg web server https://ksmg01/ksmg/en-US/cgi-bin/klwi
-	User     string
-	Password string
+	URL      []string `long:"urls-paths" env:"URL" description:"urls like https://ksmg01/ksmg/en-US/cgi-bin/klwi split with commas" env-delim:","`
+	User     string   `long:"admin-user" env:"USER" description:"admin user name"`
+	Password string   `long:"admin-password" env:"PASS" description:"admin password"`
 }
 
 // NewService initializes everything
