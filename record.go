@@ -1,5 +1,11 @@
 package ksmglog
 
+import (
+	"crypto/md5"
+	"encoding/json"
+	"fmt"
+)
+
 // Record collects all fields from ksmg json
 type Record struct {
 	ID          int    `json:"id"`
@@ -73,4 +79,12 @@ type Record struct {
 		BackupReason                 string   `json:"backupReason"`
 		UnsafeNotificationRecipients []string `json:"unsafeNotificationRecipients"`
 	} `json:"details"`
+
+	HashString string `json:"-"`
+}
+
+// Hash return hash of record
+func (o *Record) Hash() {
+	jsonBytes, _ := json.Marshal(o)
+	o.HashString = fmt.Sprintf("%x", md5.Sum(jsonBytes))
 }

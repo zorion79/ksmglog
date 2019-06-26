@@ -4,6 +4,7 @@ This library get last 500 records from Kaspersky Secure Mail Gateway (KSMG).
 
 - Collect records from many servers in one request
 - Every POST request provide timeout before run, because KSMG can return empty response.
+- Can run as service and return `chan *Record`
 
 ## Install
 
@@ -14,3 +15,4 @@ This library get last 500 records from Kaspersky Secure Mail Gateway (KSMG).
 - define options `Opts` with url's like `https://ksmg01/ksmg/en-US/cgi-bin/klwi`
 - make service `NewService(opts Opts)`
 - grab logs `GetLogs` return `type Record`
+- get `service.Channel()` and grab only latest Records

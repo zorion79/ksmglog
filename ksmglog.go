@@ -1,6 +1,7 @@
 package ksmglog
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"net/http"
@@ -16,14 +17,23 @@ import (
 // Service create engine which collects logs from ksmg
 type Service struct {
 	Opts
+
+	logMapAll map[string]*Record
+	newLogCh  chan *Record
+	loopTime  time.Time
 }
 
 // Opts collects parameters to initialize Service
 type Opts struct {
-	URL      []string `long:"urls-paths" env:"URL" description:"urls like https://ksmg01/ksmg/en-US/cgi-bin/klwi split with commas" env-delim:","`
-	User     string   `long:"admin-user" env:"USER" description:"admin user name"`
-	Password string   `long:"admin-password" env:"PASS" description:"admin password"`
+	URL       []string      `long:"urls-paths" env:"URL" description:"urls like https://ksmg01/ksmg/en-US/cgi-bin/klwi split with commas" env-delim:","`
+	User      string        `long:"admin-user" env:"USER" description:"admin user name"`
+	Password  string        `long:"admin-password" env:"PASS" description:"admin password"`
+	SleepTime time.Duration `long:"sleep-time" env:"SLEEP_TIME" default:"1m" description:"sleep time after every run"`
 }
+
+const (
+	sleepTime = 10 * time.Second
+)
 
 // NewService initializes everything
 func NewService(opts Opts) *Service {
@@ -31,7 +41,37 @@ func NewService(opts Opts) *Service {
 		Opts: opts,
 	}
 
+	if res.SleepTime.Seconds() < 1 {
+		res.SleepTime = sleepTime
+	}
+
+	res.newLogCh = make(chan *Record)
+	res.logMapAll = make(map[string]*Record)
+
 	return res
+}
+
+// Run service loop
+func (s *Service) Run(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			log.Printf("[WARN] terminate service")
+			close(s.newLogCh)
+			return
+		default:
+			logs, err := s.GetLogs()
+			if err != nil {
+				log.Printf("[WARN] could not get logs: %v", err)
+				time.Sleep(s.SleepTime)
+				continue
+			}
+
+			s.logsToChannel(logs)
+
+			time.Sleep(s.SleepTime)
+		}
+	}
 }
 
 // GetLogs return last audit logs
@@ -75,6 +115,10 @@ func (s *Service) GetLogs() (records []Record, err error) {
 	}
 
 	return records, nil
+}
+
+func (s *Service) Channel() <-chan *Record {
+	return s.newLogCh
 }
 
 func (s *Service) userLogin(ksmgURL string) (userType int, c2htoken string, cookie []*http.Cookie, err error) {
@@ -296,4 +340,24 @@ func doRequest(r *http.Request) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
+
+func (s *Service) logsToChannel(logs []Record) {
+	s.loopTime = time.Now().AddDate(0, 0, -1)
+	for _, l := range logs {
+		lTime := time.Unix(int64(l.Time), 0)
+		l.Hash()
+
+		if lTime.Before(s.loopTime) {
+			log.Printf("[DEBUG] time %v before %v", lTime, s.loopTime)
+			delete(s.logMapAll, l.HashString)
+			continue
+		}
+
+		if _, ok := s.logMapAll[l.HashString]; !ok {
+			s.logMapAll[l.HashString] = &l
+			s.newLogCh <- &l
+			continue
+		}
+	}
 }
