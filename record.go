@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 // Record collects all fields from ksmg json
@@ -84,7 +86,11 @@ type Record struct {
 }
 
 // Hash return hash of record
-func (o *Record) Hash() {
-	jsonBytes, _ := json.Marshal(o)
+func (o *Record) Hash() error {
+	jsonBytes, err := json.Marshal(o)
+	if err != nil {
+		return errors.Wrap(err, "could not marshal json")
+	}
 	o.HashString = fmt.Sprintf("%x", md5.Sum(jsonBytes))
+	return nil
 }

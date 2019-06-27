@@ -346,7 +346,16 @@ func (s *Service) logsToChannel(logs []Record) {
 	s.loopTime = time.Now().AddDate(0, 0, -1)
 	for _, l := range logs {
 		lTime := time.Unix(int64(l.Time), 0)
-		l.Hash()
+		err := l.Hash()
+		if err != nil {
+			log.Printf("[WARN] could not create hash: %v", err)
+			continue
+		}
+
+		if l.HashString == ""{
+			log.Printf("[WARN] empty hash %+v", l)
+			continue
+		}
 
 		if lTime.Before(s.loopTime) {
 			log.Printf("[DEBUG] time %v before %v", lTime, s.loopTime)
