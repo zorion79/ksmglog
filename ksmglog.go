@@ -326,7 +326,7 @@ func (s *Service) doRequest(r *http.Request) (*http.Response, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec
+				InsecureSkipVerify: true,
 			},
 		},
 		Timeout: s.Timeout,

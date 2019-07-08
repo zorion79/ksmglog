@@ -110,7 +110,7 @@ func TestService_doRequest(t *testing.T) {
 
 	svc := NewService(opts)
 
-	httpSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	httpSrv := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		time.Sleep(150 * time.Millisecond)
 	}))
 	request, err := http.NewRequest("GET", httpSrv.URL, nil)
@@ -123,7 +123,7 @@ func TestService_doRequest(t *testing.T) {
 func router(t *testing.T) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/login", func(w http.ResponseWriter, _ *http.Request) {
 		result := struct {
 			Action   string `json:"action"`
 			UserType int    `json:"userType"`
@@ -139,7 +139,7 @@ func router(t *testing.T) http.Handler {
 		assert.Nil(t, err)
 	})
 
-	mux.HandleFunc("/time", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/time", func(w http.ResponseWriter, _ *http.Request) {
 		result := struct {
 			Action   string `json:"action"`
 			ActionId int    `json:"action_id"`
@@ -154,7 +154,7 @@ func router(t *testing.T) http.Handler {
 		assert.Nil(t, err)
 	})
 
-	mux.HandleFunc("/timeID", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/timeID", func(w http.ResponseWriter, _ *http.Request) {
 		result := struct {
 			Action string `json:"action"`
 			Data   struct {
@@ -178,7 +178,7 @@ func router(t *testing.T) http.Handler {
 		assert.Nil(t, err)
 	})
 
-	mux.HandleFunc("/eventLoggerJournalQuery", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/eventLoggerJournalQuery", func(w http.ResponseWriter, _ *http.Request) {
 		result := struct {
 			Action   string `json:"action"`
 			ActionId int    `json:"action_id"`
@@ -193,7 +193,7 @@ func router(t *testing.T) http.Handler {
 		assert.Nil(t, err)
 	})
 
-	mux.HandleFunc("/eventLoggerJournalQueryWithActionID", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/eventLoggerJournalQueryWithActionID", func(w http.ResponseWriter, _ *http.Request) {
 		resultFromResp := struct {
 			Action string `json:"action"`
 			Data   struct {
