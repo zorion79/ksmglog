@@ -62,10 +62,10 @@ func router(t *testing.T) http.Handler {
 			if r.URL.Query().Get("action_id") == "" {
 				result := struct {
 					Action   string `json:"action"`
-					ActionId int    `json:"action_id"`
+					ActionID int    `json:"action_id"`
 				}{
 					Action:   "getCurrentTime",
-					ActionId: 2,
+					ActionID: 2,
 				}
 
 				resByte, err := json.Marshal(&result)
@@ -78,10 +78,10 @@ func router(t *testing.T) http.Handler {
 			if r.URL.Query().Get("action_id") == "2" {
 				result := struct {
 					Action   string `json:"action"`
-					ActionId int    `json:"action_id"`
+					ActionID int    `json:"action_id"`
 				}{
 					Action:   "eventLoggerJournalQuery",
-					ActionId: 3,
+					ActionID: 3,
 				}
 
 				resByte, err := json.Marshal(&result)
@@ -94,10 +94,10 @@ func router(t *testing.T) http.Handler {
 			if r.URL.Query().Get("action_id") == "" {
 				result := struct {
 					Action   string `json:"action"`
-					ActionId int    `json:"action_id"`
+					ActionID int    `json:"action_id"`
 				}{
 					Action:   "eventLoggerJournalQuery",
-					ActionId: 3,
+					ActionID: 3,
 				}
 
 				resByte, err := json.Marshal(&result)

@@ -1,4 +1,5 @@
 # ksmglog - get audit log records from [Kaspersky Secure Mail Gateway](https://www.kaspersky.ru/small-to-medium-business-security/mail-security-appliance)
+
 [![Build Status](https://travis-ci.com/zorion79/ksmglog.svg?branch=master)](https://travis-ci.com/zorion79/ksmglog)
 [![Coverage Status](https://coveralls.io/repos/github/zorion79/ksmglog/badge.svg)](https://coveralls.io/github/zorion79/ksmglog)
 

@@ -19,9 +19,9 @@ type Record struct {
 	EventName   string `json:"eventName"`
 	Details     struct {
 		MessageInfo struct {
-			MessageId      string   `json:"messageId"`
+			MessageID      string   `json:"messageId"`
 			Size           string   `json:"size"`
-			SmtpMessageId  string   `json:"smtpMessageId"`
+			SMTPMessageID  string   `json:"smtpMessageId"`
 			ClientAddress  string   `json:"clientAddress"`
 			ClientHostName string   `json:"clientHostName"`
 			From           string   `json:"from"`

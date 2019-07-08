@@ -118,6 +118,7 @@ func (s *Service) GetLogs() (records []Record, err error) {
 	return records, nil
 }
 
+// Channel return channel with new logs
 func (s *Service) Channel() <-chan *Record {
 	return s.newLogCh
 }
@@ -184,7 +185,7 @@ func (s *Service) getCurrentTime(ksmgURL string, c2htoken string, cookies []*htt
 
 	result := struct {
 		Action   string `json:"action"`
-		ActionId int    `json:"action_id"`
+		ActionID int    `json:"action_id"`
 	}{}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -195,7 +196,7 @@ func (s *Service) getCurrentTime(ksmgURL string, c2htoken string, cookies []*htt
 
 	log.Printf("[DEBUG] result from getCurrentTime: %v", result)
 
-	return result.Action, result.ActionId, resp.Cookies(), nil
+	return result.Action, result.ActionID, resp.Cookies(), nil
 }
 
 func (s *Service) getCurrentTimeWithActionID(ksmgURL string, c2htoken string, actionID int, cookies []*http.Cookie) ([]*http.Cookie, error) {
@@ -264,7 +265,7 @@ func (s *Service) eventLoggerJournalQuery(ksmgURL string, c2htoken string, cooki
 
 	result := struct {
 		Action   string `json:"action"`
-		ActionId int    `json:"action_id"`
+		ActionID int    `json:"action_id"`
 	}{}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -275,7 +276,7 @@ func (s *Service) eventLoggerJournalQuery(ksmgURL string, c2htoken string, cooki
 
 	log.Printf("[DEBUG] result from eventLoggerJournalQuery: %v", result)
 
-	return result.ActionId, nil
+	return result.ActionID, nil
 }
 
 func (s *Service) eventLoggerJournalQueryWithActionID(ksmgURL string, c2htoken string, actionID int, cookies []*http.Cookie) (res []Record, err error) {
