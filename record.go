@@ -1,7 +1,7 @@
 package ksmglog
 
 import (
-	"crypto/md5"
+	"crypto/md5" //nolint:gosec
 	"encoding/json"
 	"fmt"
 
@@ -92,6 +92,6 @@ func (o *Record) Hash() error {
 		return errors.Wrap(err, "could not marshal json")
 	}
 
-	o.HashString = fmt.Sprintf("%x", md5.Sum(jsonBytes))
+	o.HashString = fmt.Sprintf("%x", md5.Sum(jsonBytes)) //nolint:gosec
 	return nil
 }
