@@ -29,6 +29,7 @@ type Opts struct {
 	User      string        `long:"admin-user" env:"USER" description:"admin user name"`
 	Password  string        `long:"admin-password" env:"PASS" description:"admin password"`
 	SleepTime time.Duration `long:"sleep-time" env:"SLEEP_TIME" default:"1m" description:"sleep time after every run"`
+	Timeout   time.Duration `long:"http-time-out" env:"TIME_OUT" default:"5s" description:"http client timeout"`
 }
 
 const (
@@ -133,7 +134,7 @@ func (s *Service) userLogin(ksmgURL string) (userType int, c2htoken string, cook
 	req.URL.RawQuery = query.Encode()
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := doRequest(req)
+	resp, err := s.doRequest(req)
 	if err != nil {
 		return -1, "", []*http.Cookie{}, errors.Wrap(err, "could not request")
 	}
@@ -171,7 +172,7 @@ func (s *Service) getCurrentTime(ksmgURL string, c2htoken string, cookies []*htt
 		req.AddCookie(cookie)
 	}
 
-	resp, err := doRequest(req)
+	resp, err := s.doRequest(req)
 	if err != nil {
 		return "", -1, []*http.Cookie{}, errors.Wrap(err, "could not request")
 	}
@@ -210,7 +211,7 @@ func (s *Service) getCurrentTimeWithActionID(ksmgURL string, c2htoken string, ac
 		req.AddCookie(cookie)
 	}
 
-	resp, err := doRequest(req)
+	resp, err := s.doRequest(req)
 	if err != nil {
 		return []*http.Cookie{}, errors.Wrap(err, "could not request")
 	}
@@ -251,7 +252,7 @@ func (s *Service) eventLoggerJournalQuery(ksmgURL string, c2htoken string, cooki
 		req.AddCookie(cookie)
 	}
 
-	resp, err := doRequest(req)
+	resp, err := s.doRequest(req)
 	if err != nil {
 		return -1, err
 	}
@@ -290,7 +291,7 @@ func (s *Service) eventLoggerJournalQueryWithActionID(ksmgURL string, c2htoken s
 		req.AddCookie(cookie)
 	}
 
-	resp, err := doRequest(req)
+	resp, err := s.doRequest(req)
 	if err != nil {
 		return nil, err
 	}
@@ -321,13 +322,14 @@ func (s *Service) eventLoggerJournalQueryWithActionID(ksmgURL string, c2htoken s
 	return res, nil
 }
 
-func doRequest(r *http.Request) (*http.Response, error) {
+func (s *Service) doRequest(r *http.Request) (*http.Response, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
 		},
+		Timeout: s.Timeout,
 	}
 
 	resp, err := client.Do(r)
