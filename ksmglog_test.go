@@ -22,7 +22,8 @@ func TestService_Run(t *testing.T) {
 
 	svc := NewService(opts)
 
-	ctx, _ := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
 
 	svc.Run(ctx)
 }

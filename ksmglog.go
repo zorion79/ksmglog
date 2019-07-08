@@ -139,7 +139,7 @@ func (s *Service) userLogin(ksmgURL string) (userType int, c2htoken string, cook
 		return -1, "", []*http.Cookie{}, errors.Wrap(err, "could not request")
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
+		if err = resp.Body.Close(); err != nil {
 			log.Printf("[WARN] could not close body: %v", err)
 		}
 	}()
@@ -177,7 +177,7 @@ func (s *Service) getCurrentTime(ksmgURL string, c2htoken string, cookies []*htt
 		return "", -1, []*http.Cookie{}, errors.Wrap(err, "could not request")
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
+		if err = resp.Body.Close(); err != nil {
 			log.Printf("[WARN] could not close body: %v", err)
 		}
 	}()
@@ -216,7 +216,7 @@ func (s *Service) getCurrentTimeWithActionID(ksmgURL string, c2htoken string, ac
 		return []*http.Cookie{}, errors.Wrap(err, "could not request")
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
+		if err = resp.Body.Close(); err != nil {
 			log.Printf("[WARN] could not close body: %v", err)
 		}
 	}()
@@ -257,7 +257,7 @@ func (s *Service) eventLoggerJournalQuery(ksmgURL string, c2htoken string, cooki
 		return -1, err
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
+		if err = resp.Body.Close(); err != nil {
 			log.Printf("[WARN] could not close body: %v", err)
 		}
 	}()
@@ -296,7 +296,7 @@ func (s *Service) eventLoggerJournalQueryWithActionID(ksmgURL string, c2htoken s
 		return nil, err
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
+		if err = resp.Body.Close(); err != nil {
 			log.Printf("[WARN] could not close body: %v", err)
 		}
 	}()
@@ -326,7 +326,7 @@ func (s *Service) doRequest(r *http.Request) (*http.Response, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
+				InsecureSkipVerify: true, //nolint:gosec
 			},
 		},
 		Timeout: s.Timeout,
