@@ -347,8 +347,8 @@ func (s *Service) doRequest(r *http.Request) (*http.Response, error) {
 func (s *Service) logsToChannel(logs []Record) {
 	s.loopTime = time.Now().AddDate(0, 0, -1)
 	for _, l := range logs {
-		lTime := time.Unix(int64(l.Time), 0)
 		err := l.Hash()
+		lTime := time.Unix(int64(l.Time), 0)
 		if err != nil {
 			log.Printf("[WARN] could not create hash: %v", err)
 			continue
