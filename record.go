@@ -91,6 +91,7 @@ func (o *Record) Hash() error {
 	if err != nil {
 		return errors.Wrap(err, "could not marshal json")
 	}
+
 	o.HashString = fmt.Sprintf("%x", md5.Sum(jsonBytes))
 	return nil
 }

@@ -352,7 +352,7 @@ func (s *Service) logsToChannel(logs []Record) {
 			continue
 		}
 
-		if l.HashString == ""{
+		if len(l.HashString) < 3 {
 			log.Printf("[WARN] empty hash %+v", l)
 			continue
 		}
