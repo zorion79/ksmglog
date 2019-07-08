@@ -4,3 +4,4 @@
 .iml
 env.ps1
 *.iml
+profile.cov
