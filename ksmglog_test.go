@@ -1,17 +1,26 @@
 package ksmglog
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
-
-	//"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_ClientTimeout(t *testing.T) {
+func TestService_Run(t *testing.T) {
+	opts := Opts{}
+
+	svc := NewService(opts)
+
+	ctx, _ := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	svc.Run(ctx)
+}
+
+func TestService_doRequest(t *testing.T) {
 	opts := Opts{
 		Timeout: 100 * time.Millisecond,
 	}
