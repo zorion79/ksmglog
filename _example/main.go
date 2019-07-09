@@ -57,6 +57,7 @@ func main() {
 			if record.HashString == "" {
 				log.Printf("%d new %+v", count, record)
 			}
+			log.Printf("%d\t%+v", count, record)
 		}
 	}
 }

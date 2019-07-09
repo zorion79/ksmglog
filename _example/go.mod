@@ -4,7 +4,4 @@ go 1.12
 
 replace github.com/zorion79/ksmglog => ../
 
-require (
-	github.com/go-pkgz/lgr v0.6.3 //indirect
-	github.com/zorion79/ksmglog v0.0.0-20190625004320-c84b56ad1b75 //indirect
-)
+require github.com/zorion79/ksmglog v0.0.0-00010101000000-000000000000 // indirect
