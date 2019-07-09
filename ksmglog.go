@@ -348,28 +348,62 @@ func (s *Service) doRequest(r *http.Request) (*http.Response, error) {
 func (s *Service) logsToChannel(logs []Record) {
 	s.loopTime = time.Now().AddDate(0, 0, -1)
 	for _, l := range logs {
-		err := l.Hash()
-		lTime := time.Unix(int64(l.Time), 0)
+		s.extractToRecipient(l)
+		s.extractCcRecipient(l)
+		s.extractBccRecipient(l)
+	}
+}
+
+func (s *Service) extractToRecipient(l Record) {
+	for _, to := range l.Details.MessageInfo.To {
+		l.Details.MessageInfo.To = []string{to}
+
+		err := s.sendLog(l)
 		if err != nil {
-			log.Printf("[WARN] could not create hash: %v", err)
-			continue
-		}
-
-		if len(l.HashString) < 3 {
-			log.Printf("[WARN] empty hash %+v", l)
-			continue
-		}
-
-		if lTime.Before(s.loopTime) {
-			log.Printf("[DEBUG] time %v before %v", lTime, s.loopTime)
-			delete(s.logMapAll, l.HashString)
-			continue
-		}
-
-		if _, ok := s.logMapAll[l.HashString]; !ok {
-			s.logMapAll[l.HashString] = &l
-			s.newLogCh <- &l
+			log.Printf("[WARN] could not send log: %v", err)
 			continue
 		}
 	}
+}
+
+func (s *Service) extractCcRecipient(l Record) {
+	for _, cc := range l.Details.MessageInfo.Cc {
+		l.Details.MessageInfo.To = []string{cc}
+		err := s.sendLog(l)
+		if err != nil {
+			log.Printf("[WARN] could not send log: %v", err)
+			continue
+		}
+	}
+}
+
+func (s *Service) extractBccRecipient(l Record) {
+	for _, bcc := range l.Details.MessageInfo.Bcc {
+		l.Details.MessageInfo.To = []string{bcc}
+		err := s.sendLog(l)
+		if err != nil {
+			log.Printf("[WARN] could not send log: %v", err)
+		}
+	}
+}
+
+func (s *Service) sendLog(l Record) error {
+	if err := l.Hash(); err != nil {
+		return errors.Wrap(err, "could not create hash string")
+	}
+
+	lTime := time.Unix(int64(l.Time), 0)
+
+	if lTime.Before(s.loopTime) {
+		log.Printf("[DEBUG] time %v before %v", lTime, s.loopTime)
+		delete(s.logMapAll, l.HashString)
+		return nil
+	}
+
+	if _, ok := s.logMapAll[l.HashString]; !ok {
+		s.logMapAll[l.HashString] = &l
+		s.newLogCh <- &l
+		return nil
+	}
+	return nil
 }
