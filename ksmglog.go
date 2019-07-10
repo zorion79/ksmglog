@@ -18,8 +18,8 @@ import (
 type Service struct {
 	Opts
 
-	logMapAll map[string]*Record
-	newLogCh  chan *Record
+	logMapAll map[string]Record
+	newLogCh  chan Record
 	loopTime  time.Time
 }
 
@@ -46,8 +46,8 @@ func NewService(opts Opts) *Service {
 		res.SleepTime = sleepTime
 	}
 
-	res.newLogCh = make(chan *Record)
-	res.logMapAll = make(map[string]*Record)
+	res.newLogCh = make(chan Record)
+	res.logMapAll = make(map[string]Record)
 
 	return res
 }
@@ -119,7 +119,7 @@ func (s *Service) GetLogs() (records []Record, err error) {
 }
 
 // Channel return channel with new logs
-func (s *Service) Channel() <-chan *Record {
+func (s *Service) Channel() <-chan Record {
 	return s.newLogCh
 }
 
@@ -401,8 +401,8 @@ func (s *Service) sendLog(l Record) error {
 	}
 
 	if _, ok := s.logMapAll[l.HashString]; !ok {
-		s.logMapAll[l.HashString] = &l
-		s.newLogCh <- &l
+		s.logMapAll[l.HashString] = l
+		s.newLogCh <- l
 		return nil
 	}
 	return nil
