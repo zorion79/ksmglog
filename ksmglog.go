@@ -395,7 +395,7 @@ func (s *Service) sendLog(l Record) error {
 	lTime := time.Unix(int64(l.Time), 0)
 
 	if lTime.Before(s.loopTime) {
-		log.Printf("[DEBUG] time %v before %v", lTime, s.loopTime)
+		// log.Printf("[DEBUG] time %v before %v", lTime, s.loopTime)
 		delete(s.logMapAll, l.HashString)
 		return nil
 	}
