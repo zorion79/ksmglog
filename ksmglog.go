@@ -18,7 +18,7 @@ import (
 type Service struct {
 	Opts
 
-	logMapAll map[string]Record
+	logMapAll map[string]*Record
 	newLogCh  chan Record
 	loopTime  time.Time
 }
@@ -47,7 +47,7 @@ func NewService(opts Opts) *Service {
 	}
 
 	res.newLogCh = make(chan Record)
-	res.logMapAll = make(map[string]Record)
+	res.logMapAll = make(map[string]*Record)
 
 	return res
 }
@@ -76,8 +76,8 @@ func (s *Service) Run(ctx context.Context) {
 }
 
 // GetLogs return last audit logs
-func (s *Service) GetLogs() (records []Record, err error) {
-	records = make([]Record, 0)
+func (s *Service) GetLogs() (records []*Record, err error) {
+	records = make([]*Record, 0)
 	for _, ksmgURL := range s.URL {
 		_, c2htoken, cookies, err := s.userLogin(ksmgURL)
 		if err != nil {
@@ -279,7 +279,7 @@ func (s *Service) eventLoggerJournalQuery(ksmgURL string, c2htoken string, cooki
 	return result.ActionID, nil
 }
 
-func (s *Service) eventLoggerJournalQueryWithActionID(ksmgURL string, c2htoken string, actionID int, cookies []*http.Cookie) (res []Record, err error) {
+func (s *Service) eventLoggerJournalQueryWithActionID(ksmgURL string, c2htoken string, actionID int, cookies []*http.Cookie) (res []*Record, err error) {
 	req, _ := http.NewRequest("POST", ksmgURL, nil)
 	query := req.URL.Query()
 	query.Add("action", "eventLoggerJournalQuery")
@@ -305,10 +305,10 @@ func (s *Service) eventLoggerJournalQueryWithActionID(ksmgURL string, c2htoken s
 	resultFromResp := struct {
 		Action string `json:"action"`
 		Data   struct {
-			Count                int      `json:"count"`
-			UnlimitedResultsSize int      `json:"unlimitedResultsSize"`
-			Time                 int      `json:"time"`
-			Items                []Record `json:"items"`
+			Count                int       `json:"count"`
+			UnlimitedResultsSize int       `json:"unlimitedResultsSize"`
+			Time                 int       `json:"time"`
+			Items                []*Record `json:"items"`
 		} `json:"data"`
 	}{}
 
@@ -345,7 +345,7 @@ func (s *Service) doRequest(r *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-func (s *Service) logsToChannel(logs []Record) {
+func (s *Service) logsToChannel(logs []*Record) {
 	s.loopTime = time.Now().AddDate(0, 0, -1)
 	for _, l := range logs {
 		s.extractToRecipient(l)
@@ -354,11 +354,11 @@ func (s *Service) logsToChannel(logs []Record) {
 	}
 }
 
-func (s *Service) extractToRecipient(l Record) {
+func (s *Service) extractToRecipient(l *Record) {
 	for _, to := range l.Details.MessageInfo.To {
 		l.Details.MessageInfo.To = []string{to}
 
-		err := s.sendLog(l)
+		err := s.sendLog(*l)
 		if err != nil {
 			log.Printf("[WARN] could not send log: %v", err)
 			continue
@@ -366,10 +366,10 @@ func (s *Service) extractToRecipient(l Record) {
 	}
 }
 
-func (s *Service) extractCcRecipient(l Record) {
+func (s *Service) extractCcRecipient(l *Record) {
 	for _, cc := range l.Details.MessageInfo.Cc {
 		l.Details.MessageInfo.To = []string{cc}
-		err := s.sendLog(l)
+		err := s.sendLog(*l)
 		if err != nil {
 			log.Printf("[WARN] could not send log: %v", err)
 			continue
@@ -377,10 +377,10 @@ func (s *Service) extractCcRecipient(l Record) {
 	}
 }
 
-func (s *Service) extractBccRecipient(l Record) {
+func (s *Service) extractBccRecipient(l *Record) {
 	for _, bcc := range l.Details.MessageInfo.Bcc {
 		l.Details.MessageInfo.To = []string{bcc}
-		err := s.sendLog(l)
+		err := s.sendLog(*l)
 		if err != nil {
 			log.Printf("[WARN] could not send log: %v", err)
 		}
@@ -401,7 +401,7 @@ func (s *Service) sendLog(l Record) error {
 	}
 
 	if _, ok := s.logMapAll[l.HashString]; !ok {
-		s.logMapAll[l.HashString] = l
+		s.logMapAll[l.HashString] = nil
 		s.newLogCh <- l
 		return nil
 	}
