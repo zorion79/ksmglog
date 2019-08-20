@@ -18,7 +18,7 @@ import (
 type Service struct {
 	Opts
 
-	logMapAll map[string]*Record
+	logMapAll map[string]interface{}
 	newLogCh  chan Record
 	loopTime  time.Time
 }
@@ -47,7 +47,7 @@ func NewService(opts Opts) *Service {
 	}
 
 	res.newLogCh = make(chan Record)
-	res.logMapAll = make(map[string]*Record)
+	res.logMapAll = make(map[string]interface{})
 
 	return res
 }
